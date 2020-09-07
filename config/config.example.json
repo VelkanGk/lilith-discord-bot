@@ -1,0 +1,5 @@
+{
+	"prefix": "!",
+    "token": "<Enter Bot Token>",
+    "experimental_commands": false
+}
