@@ -1,4 +1,4 @@
-## vgk-discord-bot
+# vgk-discord-bot
 This discord bot can keep track of players custom nicknames per channel in a server and allows you to roll many dices with modifiers. This code was based on [pap-discordbot](https://github.com/LilithTheSuccubus/pap-discordbot). by [LilithTheSuccubus](https://github.com/LilithTheSuccubus)
 
 
@@ -24,32 +24,44 @@ This discord bot can keep track of players custom nicknames per channel in a ser
 <b> This bot is currently intended to be used by people who have a basic understanding of how to setup a discord bot and handle node.js. </b>
     
 ## Commands:
-Register or delete a nickname:
+- Register or delete a nickname:
+    ```
     !nick register "Nickname" "Channel_Name" <@Target_user>
     !nick delete "Nickname" "Channel_Name" <@Target_user>
+    ```
     NB: target_user is a mention to a user in the server. It's optional and requires "Admin" or "Master" role to assign nicknames to other users in the server.
 
-Roll
+- Roll
+    ```
     !2d20+2-1
     !1d20-5,1d20+2
     !roll 1d20
     !roll 3d6,2d10-4
+    ```
     NB: Lets you roll N group of dice with N modifiers to total value, also shows you the rolls result separately for your convenience.
 
-Settings
+- Settings
+    ```
     !settings prefix <character>
     !settings current_settings
     !settings experimental_commands
+    ```
     NB: Lets you change the prefix used in this bot (you can also change it directly in `config.json`). Requires "Admin" role.
 
-Flush
+- Flush
+    ```
     !flush
+    ```
     NB: Clear up to 99 messages from the channel history. Requires "Admin" role.
 
-Help
+- Help
+    ```
     !help
+    ```
     NB: List all commands and a brief description.
+    ```
     !<command> info
+    ```
     NB: shows you a complete description and usage of the command.
 
 ## Capability Clarification
