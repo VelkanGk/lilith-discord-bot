@@ -194,6 +194,35 @@ module.exports = {
         }else if (owner){
             //util.print(newState.msg,'',"Sorry Master, I'm not allowed to change your name.",'red');
         }
+    },
+    removeChannel(channel){
+        
+        //Load nicknamesTracker File
+        var nickJSON = fs.readFileSync(nameTracker);
+        nickJSON = JSON.parse(nickJSON);
+
+        //Get all registered users
+        let users = Object.keys(nickJSON.players);
+
+        //Delete all nicknames from channel
+        for(var i = 0; i < users.length; i++){
+            delete nickJSON.players[users[i]].registrations[channel.id];
+        }
+
+        //Save file
+        saveNick(nickJSON);
+    },
+    removeMember(member){
+
+        //Load nicknamesTracker File
+        var nickJSON = fs.readFileSync(nameTracker);
+        nickJSON = JSON.parse(nickJSON);
+
+        //Delete user
+        delete nickJSON.players[member.id];
+
+        //Save file
+        saveNick(nickJSON);
     }
 };
 

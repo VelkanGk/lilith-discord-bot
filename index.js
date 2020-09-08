@@ -95,6 +95,14 @@ bot.on('voiceStateUpdate', (oldState, newState) => {
     bot.commands.get('nick').renameNickname(oldState, newState);
 })
 
+bot.on("channelDelete", (channel) => {
+    bot.commands.get('nick').removeChannel(channel);
+});
+
+bot.on("guildMemberRemove", function(member){
+    bot.commands.get('nick').removeMember(member);
+});
+
 
 //FILE INIT
 function fileCheck() {
