@@ -15,7 +15,7 @@ module.exports.execute = (msg, args) => {
             switch(args[2].length){
                 case 1:
                     config.prefix = args[2];
-                    saveConfig(config);
+                    util.saveFile(configFile,fileName,config);
                     util.print(msg,'',"Done, I have changed the prefix to "+args[2],'green');
                     global.config = require('.'+configFile);
                 break;
@@ -46,7 +46,7 @@ module.exports.execute = (msg, args) => {
                 args[2] = args[2].toLowerCase();
                 if(['on','off'].indexOf(args[2]) >= 0){
                     config.experimental_commands = args[2] == 'on' ? true : false;
-                    saveConfig(config);
+                    util.saveFile(configFile,fileName,config);
                     util.print(msg,'',"Be careful now!\nI have changed experimental_commands to ["+args[2]+"]",'green');
                     global.config = require('.'+configFile);
                 }else{

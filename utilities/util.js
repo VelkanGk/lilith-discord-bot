@@ -15,5 +15,10 @@ function print(msg,title,body,color="blue"){
 
 }
 
+function saveFile(filepath,filename,fts) {
+    fs.writeFileSync(filepath, JSON.stringify(fts), null, 4);
+    console.log("Succesfully saved to [" + filename + "]!")
+}
+
 // add the code below
-module.exports = { print }
+module.exports = { print,saveFile }

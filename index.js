@@ -5,7 +5,7 @@ const BASE_AUTHOR = "Lilith the Succubus";
 const VERSION_AUTHOR = "Velkan Gk";
 
 //REQUIRED ''IMPORTS''
-global.util = require('./utilities/prettyMessages.js');     //Nice embed messsage utility
+global.util = require('./utilities/util.js');               //My useful utility library
 global.Discord = require('discord.js');                     //Required discord api
 global.fs = require('fs');                                  //File System handler
 
@@ -91,6 +91,8 @@ bot.on('message', msg => {
     }
 })
 
+//SOME OTHER EVENTS
+
 bot.on('voiceStateUpdate', (oldState, newState) => {
     bot.commands.get('nick').renameNickname(oldState, newState);
 })
@@ -101,6 +103,12 @@ bot.on("channelDelete", (channel) => {
 
 bot.on("guildMemberRemove", function(member){
     bot.commands.get('nick').removeMember(member);
+});
+bot.on("guildMemberUpdate", function(oldMember, newMember){
+    if(newMember.nickname != oldMember.nickname){
+        bot.commands.get('nickname').updateNickname(oldMember, newMember);
+    }
+    
 });
 
 

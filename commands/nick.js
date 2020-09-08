@@ -1,5 +1,4 @@
 const fs = require('fs'); //Filesystem
-const { Util } = require('discord.js');
 const trackerPath = './config/';
 const nameTrackerJSON = 'nicknameTracker.json';
 const nameTracker = trackerPath + nameTrackerJSON;
@@ -101,8 +100,8 @@ module.exports = {
         var nickJSON = fs.readFileSync(nameTracker);
         nickJSON = JSON.parse(nickJSON);
         if (!nickJSON.players) {
-            nickJSON.players = [];
-            saveNick(nickJSON);
+            nickJSON.players = {};
+            util.saveFile(nameTracker,nameTrackerJSON,nickJSON);
         }
 
         otherTarg = false;
@@ -128,7 +127,7 @@ module.exports = {
                 nickJSON.players[userID].registrations[channelID] = nickName;
 
                 //Save file
-                saveNick(nickJSON);
+                util.saveFile(nameTracker,nameTrackerJSON,nickJSON);
 
                 //Confirmation
                 util.print(msg,'',`Excellent!\nI have saved <@${userID}>'s new nickname "${nickName}" to the channel "${channelName}"`,'green');
@@ -150,7 +149,7 @@ module.exports = {
                 delete nickJSON.players[userID].registrations[channelID];
                 
                 //Save file
-                saveNick(nickJSON);
+                util.saveFile(nameTracker,nameTrackerJSON,nickJSON);
 
                 //Checks and confirms that the nickname has been removed
                 if(!(channelID in nickJSON.players[userID].registrations)){
@@ -196,7 +195,7 @@ module.exports = {
         }
     },
     removeChannel(channel){
-        
+
         //Load nicknamesTracker File
         var nickJSON = fs.readFileSync(nameTracker);
         nickJSON = JSON.parse(nickJSON);
@@ -210,7 +209,7 @@ module.exports = {
         }
 
         //Save file
-        saveNick(nickJSON);
+        util.saveFile(nameTracker,nameTrackerJSON,nickJSON);
     },
     removeMember(member){
 
@@ -222,7 +221,7 @@ module.exports = {
         delete nickJSON.players[member.id];
 
         //Save file
-        saveNick(nickJSON);
+        util.saveFile(nameTracker,nameTrackerJSON,nickJSON);
     }
 };
 
@@ -233,10 +232,6 @@ module.exports.help = {
     usage: '$nick <register/delete> "<Nick>" "<Channel Name>"\nRemember to use the quotations (")'
 }
 
-function saveNick(fts) {
-    fs.writeFileSync(nameTracker, JSON.stringify(fts), null, 4);
-    console.log("Succesfully saved to [" + nameTrackerJSON + "]!")
-}
 
 function checkNicknames(msg,channelID,userID){
     //get member to check
