@@ -3,18 +3,21 @@ This discord bot can keep track of players custom nicknames per channel in a ser
 
 
 ## Installation
-1. Create a cloud server (heroku, aws, etc.)
-2. Install node.js in cloud server
-3. Clone repository to cloud server
-4. Run the node app in cloud server
-5. Create a new app in Discord DEV and invite it to your channel
+
+1. Create a new app in Discord DEV and invite it to your channel.
+2. Create a cloud server (heroku, aws, etc.).
+3. Install node.js in cloud server.
+4. Clone repository to cloud server.
+5. Set bot Token in config file and run the node app.
 6. ENJOY!!!
 
-<b> For more details about installation, please check [WIKI > Installation](). This bot is currently intended to be used by people who have a basic understanding of how to setup a discord bot and handle node.js. </b>
+For more details about installation, please check [WIKI > Installation](https://github.com/VelkanGk/vgk-discord-bot/wiki/Installation).
+
+<b>  This bot is currently intended to be used by people who have a basic understanding of how to setup a discord bot and handle node.js. </b>
     
 ## Features:
-- Keep track of specific nicknames for users in certain channel
-- Roll any dice combination
+- Keep track of specific nicknames for users in certain channel.
+- Roll any dice combination.
 - Set manually (command line) nicknames for users.
 - Use Discord interface to change the nicknames and the bot will keep track of these changes (no command line needed).
 - On Channel delete or user removal, the bot will automatically clean up the registries. So don't worry about it.
