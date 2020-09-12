@@ -18,6 +18,7 @@ For more details about installation, please check [WIKI > Installation](https://
 ## Features:
 - Keep track of specific nicknames for users in certain channel.
 - Roll any dice combination.
+- Dedicated dice roller for some special rpgs (Vampire The Masquerade)
 - Set manually (command line) nicknames for users.
 - Use Discord interface to change the nicknames and the bot will keep track of these changes (no command line needed).
 - On Channel delete or user removal, the bot will automatically clean up the registries. So don't worry about it.
@@ -30,3 +31,6 @@ This can be circumvented by transfering ownership of the Discord Server to anoth
 You can't transfer the server ownership to a bot.
 
 <b>Never transfer ownership of Discord Server to an unrecognized account, thirt parties or someone you don't trust .</b>
+
+## Suggestions and Mods
+If you would like to improve, add or require something for this bot, please open an Issue and tell me about it! I'll be glad to hear your comments.
