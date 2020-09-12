@@ -19,7 +19,7 @@ module.exports.execute = (msg, args) => {
 	
 }
 
-module.exports.experimental = true;
+module.exports.experimental = false;
 	
 module.exports.help = {
 	name: 'flush',
