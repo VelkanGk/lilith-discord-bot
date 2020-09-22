@@ -39,6 +39,7 @@ global.config = require(trackerPath+configJSON);
 
 //Load nickname commands for auto-assignment
 const nick = require('./commands/nick.js');
+const util = require('./utilities/util.js');
 
 
 bot.on('ready', () => {
@@ -93,23 +94,33 @@ bot.on('message', msg => {
 
 //SOME OTHER EVENTS
 
+//When set registered nickname when user joins a voice channel
 bot.on('voiceStateUpdate', (oldState, newState) => {
     bot.commands.get('nick').renameNickname(oldState, newState);
 })
 
+//clean registered users nicknames from the deleted voice channel
 bot.on("channelDelete", (channel) => {
     bot.commands.get('nick').removeChannel(channel);
 });
 
+//Clean user nicknames when leaves the guild (server)
 bot.on("guildMemberRemove", function(member){
     bot.commands.get('nick').removeMember(member);
 });
+
+//Saves the new nickname when changed via discord GUI
 bot.on("guildMemberUpdate", function(oldMember, newMember){
     if(newMember.nickname != oldMember.nickname){
         bot.commands.get('nickname').updateNickname(oldMember, newMember);
     }
-    
 });
+
+//Welcome a new user
+/*client.on("guildMemberAdd", function(member){
+    util.print();
+    console.log(`a user joins a guild: ${member.tag}`);
+});*/
 
 
 //FILE INIT

@@ -1,5 +1,3 @@
-const util = require("../utilities/util");
-
 const filePath = './config/';
 const fileName = 'nicknameTracker.json';
 const file = filePath + fileName;
@@ -18,15 +16,15 @@ module.exports.updateNickname = (oldMember, newMember) => {
             util.saveFile(file,fileName,nickJSON);
         }
         var userID = newMember.user.id;
+        if(!nickJSON.players[userID]){
+            nickJSON.players[userID] = {
+                name: newMember.user.username,
+                userid: userID,
+                registrations: {}
+            }
+        }
         if(newMember.voice.channel != null){
             var channelID = newMember.voice.channel.id;
-            if(!nickJSON.players[userID]){
-                nickJSON.players[userID] = {
-                    name: newMember.user.username,
-                    userid: userID,
-                    registrations: {}
-                }
-            }
             var currentNickname = nickJSON.players[userID].registrations[channelID];
             var newNickname = newMember.nickname;
 
