@@ -15,6 +15,7 @@ module.exports.welcome = (member) => {
     util.print(msg,'',message);
 }
 
+module.exports.experimental = false;
 module.exports.help = {
     name: 'welcome',
     description: 'Give a welcome message to new users.',

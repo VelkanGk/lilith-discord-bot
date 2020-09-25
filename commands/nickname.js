@@ -46,6 +46,7 @@ module.exports.updateNickname = (oldMember, newMember) => {
         }
     }
 }
+module.exports.experimental = false;
 module.exports.help = {
     name: 'nickname',
     description: 'Updates automatically the Nickname Tracker File',

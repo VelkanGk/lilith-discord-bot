@@ -8,6 +8,7 @@ module.exports.execute = (msg, args) => {
     
 }
 
+module.exports.experimental = false;
 module.exports.help = {
     name: 'choose',
     description: 'Choose one from a given set of options',
