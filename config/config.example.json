@@ -1,5 +1,7 @@
 {
 	"prefix": "!",
     "token": "<Enter Bot Token>",
-    "experimental_commands": false
+    "experimental_commands": false,
+    "welcome":true,
+    "welcome_msg":"Welcome {user}"
 }

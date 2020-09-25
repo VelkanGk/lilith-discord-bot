@@ -1,7 +1,7 @@
 const filePath = './config/';
 const fileName = 'config.json';
 const configFile = filePath + fileName;
-const description = 'settings prefix [character]\nsettings experimental_commands [on/off]\nsettings current_settings';
+const description = 'settings prefix [character]\nsettings experimental_commands [on/off]\nsettings welcome_active [on/off]\nsettings welcome_msg Welcome {user} to the server\nsettings welcome_channel #chanel_name\nsettings current_settings';
 
 module.exports.execute = (msg, args) => {
     let modRole = msg.guild.roles.cache.find(role => role.name === "Admin");
@@ -38,6 +38,55 @@ module.exports.execute = (msg, args) => {
                 response += "\n**"+keys[i]+"**: "+val;
             }
             util.print(msg,'',response,'blue');
+        break;
+        case 'welcome_active':
+            if(!config.welcome) { config.welcome = {}; }
+            if(!config.welcome.active) { config.welcome.active = true; }
+            if(!config.welcome){ config.welcome = {}; config.welcome.active = false; }
+            if(args[2] == undefined){
+                util.print(msg,'',"The welcome_active is set to "+(config.welcome.active?'ON':'OFF'),'blue');
+            }else{
+                args[2] = args[2].toLowerCase();
+                if(['on','off'].indexOf(args[2]) >= 0){
+                    config.welcome.active = args[2] == 'on' ? true : false;
+                    util.saveFile(configFile,fileName,config);
+                    util.print(msg,'',"I have changed welcome_active to ["+args[2]+"]",'green');
+                    global.config = require('.'+configFile);
+                }else{
+                    util.print(msg,'',"You are using it wrong...\n"+p+"settings welcome_active [on/off]",'red');
+                }
+            }
+        break;
+        case 'welcome_msg':
+            if(!config.welcome) { config.welcome = {}; }
+            if(!config.welcome.msg) { config.welcome.msg = "Welcome {user}"; }
+            if(args[2] == undefined){
+                util.print(msg,'',"The welcome_text is set to:\n"+config.welcome.msg,'blue');
+            }else{
+                let m = args;
+                m.splice(0,2);
+                m = m.join(" ");
+                config.welcome.msg = m;
+                util.saveFile(configFile,fileName,config);
+                util.print(msg,'',"I have changed welcome_msg to:\n"+m,'green');
+                global.config = require('.'+configFile);
+            }
+        break;
+        case 'welcome_channel':
+            if(!config.welcome) { config.welcome = {}; }
+            if(!config.welcome.channel) { config.welcome.channel = ""; }
+            if(args[2] == undefined){
+                util.print(msg,'',"The welcome_channel is set to <#"+config.welcome.channel_ID+">",'blue');
+            }else{
+                let m = args[2].replace(/[<#>]/g,"");
+                config.welcome.channel_ID = m;
+                util.saveFile(configFile,fileName,config);
+                util.print(msg,'',"I have changed welcome_msg to <#"+config.welcome.channel_ID+">",'green');
+                global.config = require('.'+configFile);
+                /*util.saveFile(configFile,fileName,config);
+                util.print(msg,'',"I have changed welcome_msg to:\n"+m,'green');
+                global.config = require('.'+configFile);*/
+            }
         break;
         case 'experimental_commands':
             if(args[2] == undefined){

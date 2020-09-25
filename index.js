@@ -55,7 +55,7 @@ bot.on('message', msg => {
 
     //Remove Prefix and create Array with each of the arguments
     let cmdString = msg.content.substring(config.prefix.length);
-    let args = cmdString.toLowerCase().split(/ +/);
+    let args = cmdString.split(/ +/);
 
     let command;
 
@@ -117,10 +117,9 @@ bot.on("guildMemberUpdate", function(oldMember, newMember){
 });
 
 //Welcome a new user
-/*client.on("guildMemberAdd", function(member){
-    util.print();
-    console.log(`a user joins a guild: ${member.tag}`);
-});*/
+bot.on("guildMemberAdd", function(member){
+    bot.commands.get('welcome').welcome(member);
+});
 
 
 //FILE INIT
@@ -131,6 +130,11 @@ function fileCheck() {
         prefix: "!",
         token: "<Enter Bot Token>",
         experimental_commands: false,
+        welcome:{
+            active:false,
+            msg:"Welcome {user}",
+            channel_ID:""
+        }
     }
 
     if (!fs.existsSync(dir)) {
