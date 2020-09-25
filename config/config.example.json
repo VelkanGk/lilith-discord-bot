@@ -2,6 +2,9 @@
 	"prefix": "!",
     "token": "<Enter Bot Token>",
     "experimental_commands": false,
-    "welcome":true,
-    "welcome_msg":"Welcome {user}"
+    "welcome":{
+        "active":true,
+        "msg":"Welcome {user}",
+        "channel_ID":""
+    }
 }
