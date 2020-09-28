@@ -121,6 +121,11 @@ bot.on("guildMemberAdd", function(member){
     bot.commands.get('welcome').welcome(member);
 });
 
+//Set self-asigned roles
+bot.on("messageReactionAdd", function(messageReaction, user){
+    console.log(`a reaction is added to a message`);
+});
+
 
 //FILE INIT
 function fileCheck() {
