@@ -1,6 +1,6 @@
 const { MessageAttachment } = require('discord.js');
 module.exports.execute = (msg, args) => {
-    
+
     let modRole = msg.guild.roles.cache.find(role => role.name === "Admin");
     if (!modRole) { util.print(msg,'',"I can't find an Admin role in this server.",'red'); return;}
     if (!msg.member.roles.cache.has(modRole.id)){ util.print(msg,'',`Sorry <@${msg.author.id}>! I can't let you use this command`,'red'); return; }
@@ -17,9 +17,9 @@ module.exports.execute = (msg, args) => {
     util.print(msg,'',"I have sent the file as a private message",'green');
 }
 
-module.exports.experimental = true;
+module.exports.experimental = false;
 module.exports.help = {
-    name: 'gettracker',
+    name: 'getfile',
     description: 'ADMIN ONLY - Sends a private message with a file from config/',
-    usage: "$gettracker <file_name>"
+    usage: "$getfile <file_name>"
 }
