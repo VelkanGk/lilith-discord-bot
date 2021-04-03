@@ -41,8 +41,8 @@ module.exports.execute = (msg, args) => {
         break;
         case 'welcome_active':
             if(!config.welcome) { config.welcome = {}; }
-            if(!config.welcome.active) { config.welcome.active = true; }
-            if(!config.welcome){ config.welcome = {}; config.welcome.active = false; }
+            if(config.welcome.active == undefined) { config.welcome.active = false; }
+            
             if(args[2] == undefined){
                 util.print(msg,'',"The welcome_active is set to "+(config.welcome.active?'ON':'OFF'),'blue');
             }else{
@@ -74,18 +74,38 @@ module.exports.execute = (msg, args) => {
         break;
         case 'welcome_channel':
             if(!config.welcome) { config.welcome = {}; }
-            if(!config.welcome.channel) { config.welcome.channel = ""; }
+            if(!config.welcome.channel_name) { config.welcome.channel_name = ""; }
             if(args[2] == undefined){
-                util.print(msg,'',"The welcome_channel is set to <#"+config.welcome.channel_ID+">",'blue');
+                //validateChannel & search ChannelID
+                channel = msg.guild.channels.cache.filter((channel)=>{ return channel.name === args[2] && channel.type === 'text'; });
+                var channelID = "";
+                if(channel.size == 0){
+                    util.print(msg,'',"There is no channel "+args[2]+". Maybe you made a typo?",'red');
+                    return;
+                }else if(channel.size != 1){
+                    util.print(msg,'',`I have found ${channel.size} channels with the same name  ${args[2]}.\nPlease rename the channels so I can select the correct one.`,'red');
+                    return;
+                }else{
+                    channelID = channel.first().id;
+                    util.print(msg,'',"The welcome_channel is set to <#"+channelID+">",'blue');
+                }
             }else{
-                let m = args[2].replace(/[<#>]/g,"");
-                config.welcome.channel_ID = m;
-                util.saveFile(configFile,fileName,config);
-                util.print(msg,'',"I have changed welcome_msg to <#"+config.welcome.channel_ID+">",'green');
-                global.config = require('.'+configFile);
-                /*util.saveFile(configFile,fileName,config);
-                util.print(msg,'',"I have changed welcome_msg to:\n"+m,'green');
-                global.config = require('.'+configFile);*/
+                //validateChannel & search ChannelID
+                channel = msg.guild.channels.cache.filter((channel)=>{ return channel.name === args[2] && channel.type === 'text'; });
+                var channelID = "";
+                if(channel.size == 0){
+                    util.print(msg,'',"There is no channel "+args[2]+". Maybe you made a typo?",'red');
+                    return;
+                }else if(channel.size != 1){
+                    util.print(msg,'',`I have found ${channel.size} channels with the same name  ${args[2]}.\nPlease rename the channels so I can select the correct one.`,'red');
+                    return;
+                }else{
+                    channelID = channel.first().id;
+                    config.welcome.channel_name = args[2];
+                    util.saveFile(configFile,fileName,config);
+                    util.print(msg,'',"I have changed welcome_channel to <#"+channelID+">",'green');
+                    global.config = require('.'+configFile);
+                }
             }
         break;
         case 'experimental_commands':

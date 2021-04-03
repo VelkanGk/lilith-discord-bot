@@ -9,10 +9,17 @@ module.exports.execute = (msg, args) => {
 module.exports.welcome = (member) => {
     var message = config.welcome.msg;
     message = message.replace(/{user}/g,`<@${member.id}>`);
-    let channel = bot.channels.cache.filter((channel)=>{ return channel.id === config.welcome.channel_ID; });
-    if(channel == {} ) { return; }
-    let msg = { channel: channel.first() }
-    util.print(msg,'',message);
+    //validateChannel & search ChannelID
+    channel = bot.channels.cache.filter((channel)=>{ return channel.name === config.welcome.channel_name && channel.type === 'text'; });
+    if(channel.size == 0 || channel.size != 1){
+        return;
+    }else{
+        //channelID = channel.first().id;
+        let msg = { channel: channel.first() };
+        util.print(msg,'',message);
+    }
+    /*let channel = bot.channels.cache.filter((channel)=>{ return channel.id === config.welcome.channel_ID; });
+    if(channel == {} ) { return; }*/
 }
 
 module.exports.experimental = false;

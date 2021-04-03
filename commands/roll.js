@@ -26,8 +26,11 @@ module.exports.execute = (msg, args) => {
             let diceNumber = d[0];
             let diceType = d[1];
 
+
             for(let j = 0; j < diceNumber; j++ ){
-                let r = Math.floor(Math.random() * Number(diceType))+1;
+                let r = getRandomInt(1,Number(diceType));
+                
+                
                 roll.push(r);
                 total += r;
             }
@@ -38,7 +41,7 @@ module.exports.execute = (msg, args) => {
                 total += Number(m[j]);
                 dice += m[j];
             }
-
+            console.log(msg.author.id);
             //Final response
             response.push(`<@${msg.author.id}> rolled [${dice}]: **${total}** \n Results [ ${roll.join(" , ")} ]`);
             
@@ -49,6 +52,12 @@ module.exports.execute = (msg, args) => {
         //Whatever error handler :P
         util.print(msg,'',`**ERROR:** \"${error}\"`,'red');
     }
+}
+
+function getRandomInt(min, max) {
+    min = Math.ceil(min);
+    max = Math.floor(max);
+    return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
 module.exports.experimental = false;

@@ -3,8 +3,8 @@
     "token": "<Enter Bot Token>",
     "experimental_commands": false,
     "welcome":{
-        "active":true,
+        "active":false,
         "msg":"Welcome {user}",
-        "channel_ID":""
+        "channel_name":""
     }
 }
