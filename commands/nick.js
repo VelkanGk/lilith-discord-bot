@@ -189,7 +189,15 @@ module.exports = {
 
         //Set new nickname
         if(newState.member.nickname != nickname && !owner){
-            newState.member.setNickname(nickname);
+            newState.member.setNickname(nickname).catch(
+                (err) => {
+                    if(err.code == 50013){
+                        //util.print(newState.msg,'',"I'm not allowed to change "+member.user.username+"'s nickname",'red'); 
+                    }else{
+                        //util.print(newState.msg,'',"Something happened!\nI couldn't update "+member.user.username+"'s nickname\nError code: "+err.code,'red');  
+                    }
+                }
+            );
         }else if (owner){
             //util.print(newState.msg,'',"Sorry Master, I'm not allowed to change your name.",'red');
         }

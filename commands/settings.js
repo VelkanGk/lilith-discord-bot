@@ -1,20 +1,32 @@
 const filePath = './config/';
 const fileName = 'config.json';
 const configFile = filePath + fileName;
-const description = 'settings prefix [character]\nsettings experimental_commands [on/off]\nsettings welcome_active [on/off]\nsettings welcome_msg Welcome {user} to the server\nsettings welcome_channel #chanel_name\nsettings current_settings';
+let description ="";
+description += 'settings prefix [character]';
+description += '\nsettings experimental_commands [on/off]';
+description += '\nsettings welcome_active [on/off]';
+description += '\nsettings welcome_msg Welcome {user} to the server';
+description += '\nsettings welcome_channel #chanel_name';
+description += '\nsettings current_settings';
+description += '\nsettings authorize [role_mention]';
+description += '\nsettings unauthorize [role_mention]';
+description += '\nsettings clean_auth';
 
 module.exports.execute = (msg, args) => {
-    let modRole = msg.guild.roles.cache.find(role => role.name === "Admin");
-    if (!modRole) { util.print(msg,'',"I can't find an Admin role in this server.",'red'); return;}
-    if (!msg.member.roles.cache.has(modRole.id)){ util.print(msg,'',`Sorry <@${msg.author.id}>! I can't let you use this command`,'red'); return; }
 
-    let p = config.prefix;
+    if (!util.checkAuth(msg)){ 
+        util.print(msg,'',`Sorry <@${msg.author.id}>! I can't let you use this command`,'red');
+        return; 
+    }
+
+    let conf = config['guild'][msg.guild.id];
+    let p = conf.prefix;
     switch(args[1]){
         case 'prefix':
             if (args[2] == undefined){ args[2] = ''; }
             switch(args[2].length){
                 case 1:
-                    config.prefix = args[2];
+                    conf.prefix = args[2];
                     util.saveFile(configFile,fileName,config);
                     util.print(msg,'',"Done, I have changed the prefix to "+args[2],'green');
                     global.config = require('.'+configFile);
@@ -29,9 +41,9 @@ module.exports.execute = (msg, args) => {
         break;
         case 'current_settings':
             var response = "This are your current settings:";
-            let keys = Object.keys(config);
+            let keys = Object.keys(conf);
             for(let i = 0; i < keys.length; i++){
-                var val = config[keys[i]];
+                var val = conf[keys[i]];
                 switch(typeof val){
                     case 'boolean': val = val?'ON':'OFF'; break;
                 }
@@ -40,15 +52,15 @@ module.exports.execute = (msg, args) => {
             util.print(msg,'',response,'blue');
         break;
         case 'welcome_active':
-            if(!config.welcome) { config.welcome = {}; }
-            if(config.welcome.active == undefined) { config.welcome.active = false; }
+            if(!conf.welcome) { conf.welcome = {}; }
+            if(conf.welcome.active == undefined) { conf.welcome.active = false; }
             
             if(args[2] == undefined){
-                util.print(msg,'',"The welcome_active is set to "+(config.welcome.active?'ON':'OFF'),'blue');
+                util.print(msg,'',"The welcome_active is set to "+(conf.welcome.active?'ON':'OFF'),'blue');
             }else{
                 args[2] = args[2].toLowerCase();
                 if(['on','off'].indexOf(args[2]) >= 0){
-                    config.welcome.active = args[2] == 'on' ? true : false;
+                    conf.welcome.active = args[2] == 'on' ? true : false;
                     util.saveFile(configFile,fileName,config);
                     util.print(msg,'',"I have changed welcome_active to ["+args[2]+"]",'green');
                     global.config = require('.'+configFile);
@@ -58,23 +70,23 @@ module.exports.execute = (msg, args) => {
             }
         break;
         case 'welcome_msg':
-            if(!config.welcome) { config.welcome = {}; }
-            if(!config.welcome.msg) { config.welcome.msg = "Welcome {user}"; }
+            if(!conf.welcome) { conf.welcome = {}; }
+            if(!conf.welcome.msg) { conf.welcome.msg = "Welcome {user}"; }
             if(args[2] == undefined){
-                util.print(msg,'',"The welcome_text is set to:\n"+config.welcome.msg,'blue');
+                util.print(msg,'',"The welcome_text is set to:\n"+conf.welcome.msg,'blue');
             }else{
                 let m = args;
                 m.splice(0,2);
                 m = m.join(" ");
-                config.welcome.msg = m;
+                conf.welcome.msg = m;
                 util.saveFile(configFile,fileName,config);
                 util.print(msg,'',"I have changed welcome_msg to:\n"+m,'green');
                 global.config = require('.'+configFile);
             }
         break;
         case 'welcome_channel':
-            if(!config.welcome) { config.welcome = {}; }
-            if(!config.welcome.channel_name) { config.welcome.channel_name = ""; }
+            if(!conf.welcome) { conf.welcome = {}; }
+            if(!conf.welcome.channel_name) { conf.welcome.channel_name = ""; }
             if(args[2] == undefined){
                 //validateChannel & search ChannelID
                 channel = msg.guild.channels.cache.filter((channel)=>{ return channel.name === args[2] && channel.type === 'text'; });
@@ -101,27 +113,90 @@ module.exports.execute = (msg, args) => {
                     return;
                 }else{
                     channelID = channel.first().id;
-                    config.welcome.channel_name = args[2];
+                    conf.welcome.channel_name = args[2];
                     util.saveFile(configFile,fileName,config);
-                    util.print(msg,'',"I have changed welcome_channel to <#"+channelID+">",'green');
+                    util.print(msg,'',`I have changed welcome_channel to <#${channelID}>`,'green');
                     global.config = require('.'+configFile);
                 }
             }
         break;
         case 'experimental_commands':
             if(args[2] == undefined){
-                util.print(msg,'',"The experimental_command is set to "+(config.experimental_commands?'ON':'OFF'),'blue');
+                util.print(msg,'',"The experimental_command is set to "+(conf.experimental_commands?'ON':'OFF'),'blue');
             }else{
                 args[2] = args[2].toLowerCase();
                 if(['on','off'].indexOf(args[2]) >= 0){
-                    config.experimental_commands = args[2] == 'on' ? true : false;
+                    conf.experimental_commands = args[2] == 'on' ? true : false;
                     util.saveFile(configFile,fileName,config);
-                    util.print(msg,'',"Be careful now!\nI have changed experimental_commands to ["+args[2]+"]",'green');
+                    util.print(msg,'',`Be careful now!\nI have changed experimental_commands to ${args[2]}`,'green');
                     global.config = require('.'+configFile);
                 }else{
                     util.print(msg,'',"You are using it wrong...\n"+p+"settings experimental_commands [on/off]",'red');
                 }
             }
+        break;
+        case 'authorize':
+            if(args[2] != undefined && args[2] != ''){
+                let roleID = ""; 
+                if(args[2].match(/<@&\d+>/)){
+                    roleID = args[2].replace(/<@&?/,"").replace(">","");
+                }else if (args[2]){
+                    util.print(msg,'',`I can't find a role called ${args[2]} in this server.\nMaybe a typo or it wasn't recognized as mention like this <@!${msg.author.id}>`,'red');
+                    return;
+                }
+                let modRole = msg.guild.roles.cache.find(role => role.id === roleID);
+                if(modRole){
+                    conf.authorized_roles = conf.authorized_roles || [];
+                    conf.authorized_roles.push(roleID);
+                    util.saveFile(configFile,fileName,config);
+                    util.print(msg,'',`Very well, I will listen to ${args[2]} too.`,'green');
+                    global.config = require('.'+configFile);
+                }else{
+                    util.print(msg,'',`I can't find a role called ${args[2]} in this server.\nMaybe a typo or it wasn't recognized as mention like this <@!${msg.author.id}>`,'red');
+                }
+            }else{
+                if(conf.authorized_roles.length > 0){
+                    util.print(msg,'',`This are the current authorized roles:\n   - <@&${conf.authorized_roles.join('>\n   - <@&')}>`);
+                }else{
+                    util.print(msg,"Only the server owner is authorized");
+                }
+            }
+        break;
+        case 'unauthorize':
+            if(args[2] != undefined && args[2] != ''){
+                let roleID = ""; 
+                if(args[2].match(/<@&\d+>/)){
+                    roleID = args[2].replace(/<@&?/,"").replace(">","");
+                }else if (args[2]){
+                    util.print(msg,'',`I can't find a role called ${args[2]} in this server.\nMaybe a typo or it wasn't recognized as mention like this <@!${msg.author.id}>`,'red');
+                    return;
+                }
+                let modRole = msg.guild.roles.cache.find(role => role.id === roleID);
+
+                if(-1 < conf.authorized_roles.indexOf(roleID)){
+                    conf.authorized_roles.splice(conf.authorized_roles.indexOf(roleID),1);
+                    util.saveFile(configFile,fileName,config);
+                    util.print(msg,'',`${args[2]} is no longer authorized.`,'green');
+                    global.config = require('.'+configFile);
+                }else{
+                    util.print(msg,'',`"${args[2]}" Is not recorded on my book, maybe a typo?`);
+                }
+            }else{
+                util.print(msg,'',`You need to tell which role you would like me to remove.\nTry this way ${p}settings unauthorize [Role_name]`);
+            }
+        break;
+        case 'clean_auth':
+            let roles = conf.authorized_roles;
+            let newRoles = [];
+            for(let i = 0; i < roles.length; i++){
+                let modRole = msg.guild.roles.cache.find(role => role.id === roles[i]);
+                if(modRole) newRoles.push(roles[i]);
+            }
+            conf.authorized_roles = newRoles;
+            util.saveFile(configFile,fileName,config);
+            util.print(msg,'',`This are the current authorized roles:\n   - <@&${conf.authorized_roles.join('>\n   - <@&')}>`);
+            global.config = require('.'+configFile);
+            
         break;
         default:
             util.print(msg,'',`Hi <@${msg.author.id}>! What would you like me to do?\n`+description,'blue');
@@ -135,9 +210,4 @@ module.exports.help = {
     name: 'settings',
     description: 'Change config variables',
     usage: description
-}
-
-function saveConfig(fts) {
-    fs.writeFileSync(configFile, JSON.stringify(fts), null, 4);
-    console.log("Succesfully saved to [" + fileName + "]!")
 }

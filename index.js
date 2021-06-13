@@ -1,7 +1,7 @@
+const util = require('./utilities/util.js');
 
 //VERSION 
-const VERSION = "2.0";
-const BASE_AUTHOR = "Lilith the Succubus";
+const VERSION = "3.0.0";
 const VERSION_AUTHOR = "Velkan Gk";
 
 //REQUIRED ''IMPORTS''
@@ -24,37 +24,47 @@ for (const file of commandFiles) {
 }
 
 //Filesystem Handling
-const nameTrackerJSON = 'nicknameTracker.json';
-const configJSON = 'config.json';
-var files = [nameTrackerJSON, configJSON];
-
 const trackerPath = './config/';
-const initTracker = { "players": {} }
+
+const nicknamesJSON = 'nicknames.json';
+const configJSON = 'config.json';
+const diceJSON = 'dice.json';
+var files = [nicknamesJSON, configJSON,diceJSON];
+
 
 //Check directory and required files existance
-fileCheck();
+util.fileCheck(trackerPath,files);
+
 
 //Load global config
 global.config = require(trackerPath+configJSON);
+global.diceTracker = require(trackerPath+diceJSON);
+global.nickTracker = require(trackerPath+nicknamesJSON);
 
-//Load nickname commands for auto-assignment
-const nick = require('./commands/nick.js');
-const util = require('./utilities/util.js');
-
+//discord bot authentication
+bot.login(config.token)
+    .then(console.log("Bot Login"))
+    .catch(error => console.log("The provided token is invalid. Please check your config file in config/config.json for a valid bot token.\n" + error))
 
 bot.on('ready', () => {
     console.log('This bot is now active\nVersion: ' + VERSION);
 });
 
+// ################ EVENTS ######################
 
-
+// Each message
 bot.on('message', msg => {
 
+    util.checkGuild(config,msg);
+
+    let guildID = msg.guild.id
+    let prefix = config["guild"][guildID]['prefix'];
+
     //Exit when incoming message does not start with specifed prefix or is sent by the bot
-    if (!msg.content.startsWith(config.prefix) || msg.author.bot) return;
+    if (!msg.content.startsWith(prefix) || msg.author.bot) return;
 
     //Remove Prefix and create Array with each of the arguments
-    let cmdString = msg.content.substring(config.prefix.length);
+    let cmdString = msg.content.substring(prefix.length);
     let args = cmdString.split(/ +/);
 
     let command;
@@ -62,6 +72,8 @@ bot.on('message', msg => {
     //Check if is a dice cmd
     if(cmdString.match(/^\d+/) || cmdString.match(/^[dD]/)){
         command = 'roll';
+    }else if(cmdString.match(/^min/) || cmdString.match(/^max/)){
+        command = 'minmax';
     }else{
         //First argument passed is set to command
         command = args[0];
@@ -75,11 +87,7 @@ bot.on('message', msg => {
         
         if (msg.content.includes("info")) {
             util.print(msg,command,bot.commands.get(command).help.description+"\n"+bot.commands.get(command).help.usage,'blue');
-        }
-        else if (msg.content.includes("debug")) {
-            bot.commands.get(command).debug(msg, args);
-        }
-        else {
+        }else {
             if (bot.commands.get(command).experimental && !config.experimental_commands) {
                 util.print(msg,'ERROR',"The command you tried to use is experimental.\nThe use may severly break the bot or other features\nTo activate it's use, change \`experimental_commands\` in settings",'red');
             } else {
@@ -92,84 +100,37 @@ bot.on('message', msg => {
     }
 })
 
-//SOME OTHER EVENTS
-
-//When set registered nickname when user joins a voice channel
-bot.on('voiceStateUpdate', (oldState, newState) => {
-    bot.commands.get('nick').renameNickname(oldState, newState);
-})
-
-//clean registered users nicknames from the deleted voice channel
-bot.on("channelDelete", (channel) => {
-    bot.commands.get('nick').removeChannel(channel);
-});
-
-//Clean user nicknames when leaves the guild (server)
-bot.on("guildMemberRemove", function(member){
-    bot.commands.get('nick').removeMember(member);
-});
-
-//Saves the new nickname when changed via discord GUI
-bot.on("guildMemberUpdate", function(oldMember, newMember){
-    if(newMember.nickname != oldMember.nickname){
-        bot.commands.get('nickname').updateNickname(oldMember, newMember);
-    }
-});
-
 //Welcome a new user
 bot.on("guildMemberAdd", function(member){
     bot.commands.get('welcome').welcome(member);
 });
 
-//Set self-asigned roles
-bot.on("messageReactionAdd", function(messageReaction, user){
-    console.log(`a reaction is added to a message`);
+
+//change user nickname when joining a channel
+bot.on('voiceStateUpdate', (oldState, newState) => {
+    if(oldState.channelID != newState.channelID){
+        bot.commands.get('nickname').renameNickname(oldState, newState);
+    }
+})
+
+//Saves the new nickname when changed via discord GUI
+bot.on("guildMemberUpdate", function(oldMember, newMember){
+    bot.commands.get('nickname').updateNickname(oldMember, newMember);
 });
 
+//clean registered users nicknames from the deleted voice channel
+bot.on("channelDelete", (channel) => {
+    bot.commands.get('nickname').removeChannel(channel);
+});
 
-//FILE INIT
-function fileCheck() {
-    var dir = "config"
+//Clean user nicknames when leaves the guild (server)
+bot.on("guildMemberRemove", function(member){
+    bot.commands.get('nickname').removeMember(member);
+});
 
-    var config_prefab = {
-        prefix: "!",
-        token: "<Enter Bot Token>",
-        experimental_commands: false,
-        welcome:{
-            active:false,
-            msg:"Welcome {user}",
-            channel_ID:""
-        }
-    }
-
-    if (!fs.existsSync(dir)) {
-        fs.mkdirSync(dir);
-    }
-
-    var emptyJson = "";
-    for (var file of files) {
-        if (fs.existsSync(trackerPath + file)) {
-            console.warn(`${file} exists. Moving on.`);
-        }
-        else {
-            console.warn(`${file} file missing -> Creating a new one`);
-            switch (file) {
-                case "config.json":
-                    emptyJson = JSON.stringify(config_prefab);
-                    break;
-                default:
-                    emptyJson = JSON.stringify(initTracker);
-                    break;
-            }
-            var path = trackerPath + file;
-            //Needs to be syncronized to correcty write to files
-            fs.writeFileSync(path, emptyJson, function (err, result) {
-                if (err) console.log('error', err);
-            });
-        }
-    }
-}
-
-bot.login(config.token)
-    .then(console.log("Bot Login"))
-    .catch(error => console.log("The provided token is invalid. Please check your config file in config/config.json for a valid bot token.\n" + error))
+bot.on('messageReactionAdd',function(msgReaction,user){
+    console.log("reaction Added");
+});
+bot.on('messageReactionRemove',function(msgReaction,user){
+    console.log("reaction removed");
+});

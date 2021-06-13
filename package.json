@@ -1,15 +1,14 @@
 {
-  "name": "vgk-discord-bot",
-  "version": "1.0.0",
+  "name": "lilith-discord-bot",
+  "version": "3.0.0",
   "description": "",
   "main": "index.js",
-  "scripts":{
-    "start":"node index.js"
+  "scripts": {
+    "start": "node index.js"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "author": "Velkan Gk",
+  "license": "MIT",
   "dependencies": {
-    "discord.js": "^12.3.1"
+    "discord.js": "^12.5.3"
   }
 }

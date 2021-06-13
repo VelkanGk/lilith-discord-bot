@@ -1,6 +1,5 @@
 node_modules
 config/config.json
-config/config1.json
 config/config2.json
-nicknameTracker.json
-node_modules
+config/dice.json
+config/nicknames.json

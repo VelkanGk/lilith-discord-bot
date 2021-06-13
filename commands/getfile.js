@@ -1,9 +1,10 @@
 const { MessageAttachment } = require('discord.js');
 module.exports.execute = (msg, args) => {
 
-    let modRole = msg.guild.roles.cache.find(role => role.name === "Admin");
-    if (!modRole) { util.print(msg,'',"I can't find an Admin role in this server.",'red'); return;}
-    if (!msg.member.roles.cache.has(modRole.id)){ util.print(msg,'',`Sorry <@${msg.author.id}>! I can't let you use this command`,'red'); return; }
+    if (!util.checkAuth(msg)){ 
+        util.print(msg,'',`Sorry <@${msg.author.id}>! I can't let you use this command`,'red');
+        return; 
+    }
 
     // Remove command
     args.splice(0,1);
