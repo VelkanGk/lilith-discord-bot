@@ -1,10 +1,6 @@
 {
-	"prefix": "!",
-    "token": "<Enter Bot Token>",
-    "experimental_commands": false,
-    "welcome":{
-        "active":false,
-        "msg":"Welcome {user}",
-        "channel_name":""
-    }
+	"prefix": ".",
+	"token": "<Enter token here>",
+	"guild": {
+	}
 }
