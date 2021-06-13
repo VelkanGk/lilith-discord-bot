@@ -1,4 +1,4 @@
-# vgk-discord-bot
+# lilith-discord-bot
 This discord bot can keep track of players custom nicknames per channel in a server and allows you to roll many dices with modifiers. This code was based on [pap-discordbot](https://github.com/LilithTheSuccubus/pap-discordbot) by [LilithTheSuccubus](https://github.com/LilithTheSuccubus) under her [MIT Licence](https://github.com/LilithTheSuccubus/pap-discordbot/blob/master/LICENSE)
 
 
