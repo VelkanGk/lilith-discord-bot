@@ -1,9 +1,10 @@
-const { MessageEmbed } = require('discord.js');
+const { EmbedBuilder } = require('discord.js');
 
 function print(msg,title,body,color="blue"){
-    const embed = new MessageEmbed();
+    const embed = new EmbedBuilder();
     switch(color){
         case "red": color = "ff0000"; break;
+        case "yellow": color = "ffd500"; break;
         case "green": color = "00ff00"; break;
         case "blue": color = "0000ff"; break;
     }
@@ -11,7 +12,7 @@ function print(msg,title,body,color="blue"){
     if(color.trim() != ""){ embed.setColor('0x'+color); }
     if(body.trim() != ""){ embed.setDescription(body); }
 
-    msg.channel.send(embed);
+    msg.channel.send({embeds: [embed]});
 
 }
 
@@ -72,7 +73,7 @@ function fileCheck(path,files) {
 
 function checkAuth(msg){
     let authorized = false;
-    let owner = msg.guild.ownerID;
+    let owner = msg.guild.ownerId;
     authorized = owner == msg.author.id;
 
     let roles = config['guild'][msg.guild.id]['authorized_roles'];

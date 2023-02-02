@@ -27,17 +27,23 @@ module.exports.execute = (msg, args) => {
         //get first channel from collection
         channel = channel.first();
 
+        let guildID = msg.guild.id;
+        
         //Load nicknamesTracker File
         var nickJSON = fs.readFileSync(file);
         nickJSON = JSON.parse(nickJSON);
-        if (!nickJSON.players) {
-            nickJSON.players = {};
+        if (!nickJSON[guildID]) {
+            nickJSON[guildID] = {};
             util.saveFile(file,fileName,nickJSON);
         }
+        
 
         //For each member connected in the voice channel
         for (const [memberID, member] of channel.members) {
-            var newNickname = nickJSON.players[member.id].registrations[channel.id];
+            
+            if(nickJSON[guildID][member.id] == undefined) continue;
+
+            var newNickname = nickJSON[guildID][member.id].registrations[channel.id];
             var currentNickname = member.nickname;
             //set new nickname
             if(newNickname == undefined || newNickname == ''){ 

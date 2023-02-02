@@ -60,18 +60,32 @@ module.exports.renameNickname = (oldState,newState) => {
     if (oldState.channelID === newState.channelID) return;
 
     let guildID = newState.guild.id;
+
+    //Check if guild exists in file, otherwise creates it
+    if (!nickTracker[guildID]) nickTracker[guildID] = {};
+
+    //Check if user exists in file, otherwise creates it
+    var userID = newState.member.user.id;
+    if(!nickTracker[guildID][userID]){
+        nickTracker[guildID][userID] = {
+            name: newState.member.user.username,
+            userid: userID,
+            registrations: {}
+        }
+        util.saveFile(file,fileName,nickTracker);
+    }
     
     //Check if userid is in players
-    if (!(newState.member.user.id in nickTracker[guildID])) return;
+    if (!(userID in nickTracker[guildID])) return;
     
     //Retrive nickname
-    var alias = nickTracker[guildID][newState.member.user.id].registrations[newState.channelID];
+    var alias = nickTracker[guildID][userID].registrations[newState.channelID];
     
     //If alias is empty or doesn't exist, assign the default name
-    if(alias == undefined || alias == ''){ alias = nickTracker[guildID][newState.member.user.id].name; }
+    if(alias == undefined || alias == ''){ alias = nickTracker[guildID][userID].name; }
 
     //Due to Discord permissions, no bot is allowed to change a server's owner nickname.
-    owner = newState.guild.ownerID == newState.member.user.id;
+    owner = newState.guild.ownerID == userID;
 
     //Set new nickname
     if(newState.member.nickname != alias && !owner){

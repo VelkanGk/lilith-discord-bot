@@ -1,14 +1,15 @@
 {
+  "dependencies": {
+    "discord.js": "^14.7.1"
+  },
   "name": "lilith-discord-bot",
-  "version": "3.0.0",
-  "description": "",
+  "version": "3.10.0",
+  "description": "Support and buttler bot for discord server",
   "main": "index.js",
+  "devDependencies": {},
   "scripts": {
-    "start": "node index.js"
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Velkan Gk",
-  "license": "MIT",
-  "dependencies": {
-    "discord.js": "^12.5.3"
-  }
+  "license": "MIT"
 }

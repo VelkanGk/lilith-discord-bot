@@ -31,30 +31,6 @@ module.exports.execute = (msg, args) => {
 
             for(let j = 0; j < diceNumber; j++ ){
                 let r = getRandomInt(1,Number(diceType));
-                let done = false;
-                if(diceTracker[guildID] != undefined){
-                    if(diceTracker[guildID][msg.author.id] != undefined){
-                        if(diceTracker[guildID][msg.author.id][diceType] != undefined){
-                            if(diceTracker[guildID][msg.author.id][diceType].length > 0){
-                                r = Number(diceTracker[guildID][msg.author.id][diceType][0]);
-                                diceTracker[guildID][msg.author.id][diceType].splice(0,1);
-                                done = true;
-                            }
-                        }
-                    }
-                    if(!done){
-                        if(diceTracker[guildID]["general"] != undefined){
-                            if(diceTracker[guildID]["general"][diceType] != undefined){
-                                if(diceTracker[guildID]["general"][diceType].length > 0){
-                                    r = Number(diceTracker[guildID]["general"][diceType][0]);
-                                    diceTracker[guildID]["general"][diceType].splice(0,1);
-                                    done = true;
-                                }
-                            }
-                        }
-                    }
-
-                }
                 roll.push(r);
                 total += r;
             }

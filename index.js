@@ -1,8 +1,6 @@
-const util = require('./utilities/util.js');
+const VERSION = "3.10.0";
 
-//VERSION 
-const VERSION = "3.0.0";
-const VERSION_AUTHOR = "Velkan Gk";
+const {Client, GatewayIntentBits, EmbedBuilder, PermissionsBitField,Permissions} = require(`discord.js`);
 
 //REQUIRED ''IMPORTS''
 global.util = require('./utilities/util.js');               //My useful utility library
@@ -11,7 +9,7 @@ global.fs = require('fs');                                  //File System handle
 
 
 //Main Instance of the bot, call this for everything
-global.bot = new Discord.Client();
+global.bot = new Client({intents:[GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.MessageContent] });
 
 //Code for dynamic command handling
 bot.commands = new Discord.Collection();
@@ -23,23 +21,20 @@ for (const file of commandFiles) {
     bot.commands.set(command.help.name, command);
 }
 
+
 //Filesystem Handling
 const trackerPath = './config/';
-
 const nicknamesJSON = 'nicknames.json';
 const configJSON = 'config.json';
-const diceJSON = 'dice.json';
-var files = [nicknamesJSON, configJSON,diceJSON];
-
+var files = [nicknamesJSON, configJSON];
 
 //Check directory and required files existance
 util.fileCheck(trackerPath,files);
 
-
 //Load global config
 global.config = require(trackerPath+configJSON);
-global.diceTracker = require(trackerPath+diceJSON);
 global.nickTracker = require(trackerPath+nicknamesJSON);
+
 
 //discord bot authentication
 bot.login(config.token)
@@ -47,13 +42,15 @@ bot.login(config.token)
     .catch(error => console.log("The provided token is invalid. Please check your config file in config/config.json for a valid bot token.\n" + error))
 
 bot.on('ready', () => {
-    console.log('This bot is now active\nVersion: ' + VERSION);
+    console.log('This bot is now active\nv'+VERSION);
 });
+
+
 
 // ################ EVENTS ######################
 
 // Each message
-bot.on('message', msg => {
+bot.on('messageCreate', msg => {
 
     util.checkGuild(config,msg);
 
@@ -100,37 +97,4 @@ bot.on('message', msg => {
     }
 })
 
-//Welcome a new user
-bot.on("guildMemberAdd", function(member){
-    bot.commands.get('welcome').welcome(member);
-});
 
-
-//change user nickname when joining a channel
-bot.on('voiceStateUpdate', (oldState, newState) => {
-    if(oldState.channelID != newState.channelID){
-        bot.commands.get('nickname').renameNickname(oldState, newState);
-    }
-})
-
-//Saves the new nickname when changed via discord GUI
-bot.on("guildMemberUpdate", function(oldMember, newMember){
-    bot.commands.get('nickname').updateNickname(oldMember, newMember);
-});
-
-//clean registered users nicknames from the deleted voice channel
-bot.on("channelDelete", (channel) => {
-    bot.commands.get('nickname').removeChannel(channel);
-});
-
-//Clean user nicknames when leaves the guild (server)
-bot.on("guildMemberRemove", function(member){
-    bot.commands.get('nickname').removeMember(member);
-});
-
-bot.on('messageReactionAdd',function(msgReaction,user){
-    console.log("reaction Added");
-});
-bot.on('messageReactionRemove',function(msgReaction,user){
-    console.log("reaction removed");
-});
