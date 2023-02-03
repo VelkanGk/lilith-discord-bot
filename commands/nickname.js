@@ -27,18 +27,18 @@ module.exports.updateNickname = (oldMember, newMember) => {
 
         //check if user is conected in voice channel
         if(newMember.voice.channel != null){
-            var channelID = newMember.voice.channel.id;
-            var currentNickname = nickTracker[guildID][userID].registrations[channelID];
+            var channelId = newMember.voice.channel.id;
+            var currentNickname = nickTracker[guildID][userID].registrations[channelId];
             var newNickname = newMember.nickname;
 
-            if((newNickname == undefined || newNickname == '') && nickTracker[guildID][userID].registrations[channelID] != undefined){ 
-                delete nickTracker[guildID][userID].registrations[channelID];
+            if((newNickname == undefined || newNickname == '') && nickTracker[guildID][userID].registrations[channelId] != undefined){ 
+                delete nickTracker[guildID][userID].registrations[channelId];
                 util.saveFile(file,fileName,nickTracker);
                 return; 
             }
 
             if(newNickname != currentNickname){
-                nickTracker[guildID][userID].registrations[channelID] = newNickname;
+                nickTracker[guildID][userID].registrations[channelId] = newNickname;
                 util.saveFile(file,fileName,nickTracker);
             }
 
@@ -57,7 +57,7 @@ module.exports.updateNickname = (oldMember, newMember) => {
 
 module.exports.renameNickname = (oldState,newState) => {
     //if user has not switched channels
-    if (oldState.channelID === newState.channelID) return;
+    if (oldState.channelId === newState.channelId) return;
 
     let guildID = newState.guild.id;
 
@@ -79,27 +79,34 @@ module.exports.renameNickname = (oldState,newState) => {
     if (!(userID in nickTracker[guildID])) return;
     
     //Retrive nickname
-    var alias = nickTracker[guildID][userID].registrations[newState.channelID];
+    var alias = nickTracker[guildID][userID].registrations[newState.channelId];
     
     //If alias is empty or doesn't exist, assign the default name
     if(alias == undefined || alias == ''){ alias = nickTracker[guildID][userID].name; }
 
     //Due to Discord permissions, no bot is allowed to change a server's owner nickname.
-    owner = newState.guild.ownerID == userID;
+    owner = newState.guild.ownerId == userID;
 
     //Set new nickname
     if(newState.member.nickname != alias && !owner){
         newState.member.setNickname(alias).catch(
             (err) => {
-                if(err.code == 50013){
-                    //util.print(newState.msg,'',"I'm not allowed to change "+member.user.username+"'s nickname",'red'); 
-                }else{
-                    //util.print(newState.msg,'',"Something happened!\nI couldn't update "+member.user.username+"'s nickname\nError code: "+err.code,'red');  
+                if(newState.channelId != null){
+                    let channel = bot.channels.cache.filter((channel)=>{return channel.id == newState.channelId;  }).first();
+                    if(err.code == 50013){
+                        channel.send({embeds: [util.doEmbed('',"Sorry <@"+userID+">, I'm not allowed to change your nickname.",'red')]});
+                    }else{
+                        channel.send({embeds: [util.doEmbed('',"Something happened!\nI couldn't update <@"+userID+">'s nickname\nError code: "+err.code,'red')]});
+                    }
+
                 }
             }
         );
     }else if (owner){
-        //util.print(newState.msg,'',"Sorry Master, I'm not allowed to change your name.",'red');
+        if(newState.channelId != null){
+            let channel = bot.channels.cache.filter((channel)=>{return channel.id == newState.channelId;  }).first();
+            channel.send({embeds: [util.doEmbed('',"Sorry <@"+userID+">, I'm not allowed to change your nickname.",'red')]});
+        }
     }
 }
 

@@ -1,6 +1,11 @@
 const { EmbedBuilder } = require('discord.js');
 
 function print(msg,title,body,color="blue"){
+    const embed = doEmbed(title,body,color);
+    msg.channel.send({embeds: [embed]});
+}
+
+function doEmbed(title,body,color="blue"){
     const embed = new EmbedBuilder();
     switch(color){
         case "red": color = "ff0000"; break;
@@ -12,7 +17,7 @@ function print(msg,title,body,color="blue"){
     if(color.trim() != ""){ embed.setColor('0x'+color); }
     if(body.trim() != ""){ embed.setDescription(body); }
 
-    msg.channel.send({embeds: [embed]});
+    return embed;
 
 }
 
@@ -90,4 +95,4 @@ function checkAuth(msg){
 }
 
 // add the code below
-module.exports = { print,saveFile,fileCheck,checkGuild,checkAuth }
+module.exports = { print, doEmbed,saveFile,fileCheck,checkGuild,checkAuth }

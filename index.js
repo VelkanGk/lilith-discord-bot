@@ -1,6 +1,6 @@
 const VERSION = "3.10.0";
 
-const {Client, GatewayIntentBits, EmbedBuilder, PermissionsBitField,Permissions} = require(`discord.js`);
+const {Client, GatewayIntentBits} = require(`discord.js`);
 
 //REQUIRED ''IMPORTS''
 global.util = require('./utilities/util.js');               //My useful utility library
@@ -9,7 +9,17 @@ global.fs = require('fs');                                  //File System handle
 
 
 //Main Instance of the bot, call this for everything
-global.bot = new Client({intents:[GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.MessageContent] });
+global.bot = new Client({
+    intents:[
+        GatewayIntentBits.Guilds, 
+        GatewayIntentBits.GuildMessages, 
+        GatewayIntentBits.MessageContent,
+        GatewayIntentBits.GuildMembers,
+        GatewayIntentBits.GuildVoiceStates,
+        GatewayIntentBits.GuildPresences,
+        GatewayIntentBits.GuildMessageReactions
+    ] 
+});
 
 //Code for dynamic command handling
 bot.commands = new Discord.Collection();
@@ -48,6 +58,8 @@ bot.on('ready', () => {
 
 
 // ################ EVENTS ######################
+
+
 
 // Each message
 bot.on('messageCreate', msg => {
@@ -95,6 +107,40 @@ bot.on('messageCreate', msg => {
         console.error(error);
         util.print(msg,'ERROR','Invalid Syntax: '+error,'red');
     }
+});
+
+
+//Welcome a new user
+bot.on("guildMemberAdd", (member) => {
+    bot.commands.get('welcome').welcome(member);
+});
+
+
+//change user nickname when joining a channel
+bot.on('voiceStateUpdate', (oldState, newState) => {
+    if(oldState.channelId != newState.channelId){
+        bot.commands.get('nickname').renameNickname(oldState, newState);
+    }
 })
 
+//Saves the new nickname when changed via discord GUI
+bot.on("guildMemberUpdate", (oldMember, newMember) => {
+    bot.commands.get('nickname').updateNickname(oldMember, newMember);
+});
 
+//clean registered users nicknames from the deleted voice channel
+bot.on("channelDelete", (channel) => {
+    bot.commands.get('nickname').removeChannel(channel);
+});
+
+//Clean user nicknames when leaves the guild (server)
+bot.on("guildMemberRemove", (member) => {
+    bot.commands.get('nickname').removeMember(member);
+});
+
+bot.on('messageReactionAdd',(msgReaction,user) => {
+    console.log("reaction Added");
+});
+bot.on('messageReactionRemove', (msgReaction,user) => {
+    console.log("reaction removed");
+});
