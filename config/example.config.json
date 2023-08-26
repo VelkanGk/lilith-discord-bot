@@ -1,0 +1,16 @@
+{
+	"prefix": ".",
+	"token": "",
+	"guild": {
+		"[guild_id]": {
+			"prefix": ".",
+            "bot_id":"",
+			"authorized_roles": ["[member_id]"],
+			"welcome": {
+				"active": false,
+				"msg": "",
+				"channel_name": "general"
+			}
+		}
+	}
+}

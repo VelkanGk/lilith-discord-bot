@@ -1,20 +1,25 @@
 const { EmbedBuilder } = require('discord.js');
 
+function reply(msg,title,body,color="blue"){
+    const embed = genEmbed(title,body,color);
+    msg.reply({embeds: [embed]});
+}
 function print(msg,title,body,color="blue"){
-    const embed = doEmbed(title,body,color);
+    const embed = genEmbed(title,body,color);
     msg.channel.send({embeds: [embed]});
 }
 
-function doEmbed(title,body,color="blue"){
+function genEmbed(title,body,color="blue"){
     const embed = new EmbedBuilder();
     switch(color){
-        case "red": color = "ff0000"; break;
-        case "yellow": color = "ffd500"; break;
-        case "green": color = "00ff00"; break;
-        case "blue": color = "0000ff"; break;
+        case "red": color = 0xff0000; break;
+        case "yellow": color = 0xffd500; break;
+        case "green": color = 0x00ff00; break;
+        case "blue": color = 0x0000ff; break;
+        default: color = 0xffffff; break;
     }
+    embed.setColor(color);
     if(title.trim() != ""){ embed.setTitle(title); }
-    if(color.trim() != ""){ embed.setColor('0x'+color); }
     if(body.trim() != ""){ embed.setDescription(body); }
 
     return embed;
@@ -31,6 +36,7 @@ function checkGuild(config,msg){
     if(config['guild'][msg.guild.id] == undefined){
         config['guild'][msg.guild.id] = {
             prefix : config.prefix,
+            bot_id:"",
             authorized_roles:[],
             welcome : {
                 active : false,
@@ -79,7 +85,7 @@ function fileCheck(path,files) {
 function checkAuth(msg){
     let authorized = false;
     let owner = msg.guild.ownerId;
-    authorized = owner == msg.author.id;
+    authorized = owner == msg.user.id;
 
     let roles = config['guild'][msg.guild.id]['authorized_roles'];
     if(!authorized){
@@ -95,4 +101,4 @@ function checkAuth(msg){
 }
 
 // add the code below
-module.exports = { print, doEmbed,saveFile,fileCheck,checkGuild,checkAuth }
+module.exports = { reply, print, genEmbed,saveFile,fileCheck,checkGuild,checkAuth }

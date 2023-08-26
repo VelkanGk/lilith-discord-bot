@@ -1,5 +1,3 @@
-const { Util } = require("discord.js");
-
 module.exports.execute = (msg, args) => {
     fs.readdir("./commands/", (err, files) => {
         if(err) console.error(err);
@@ -13,17 +11,17 @@ module.exports.execute = (msg, args) => {
         let response = [];
         let result = jsfiles.forEach((f, i) => {
             let props = require(`./${f}`);
-            response.push("**"+p+props.help.name+"**: "+props.help.description);
+            response.push("**/"+props.help.name+"**: "+props.help.description);
         });
-        response.push("\nFor **usage** write: "+p+"[cmd] info")
-        util.print(msg,'',response.join("\n"),'blue');
+        // response.push("\nFor **usage** write: /[cmd] info")
+        util.reply(msg,'',response.join("\n"),'blue');
 
     });
 }
 
-module.exports.experimental = false;
 module.exports.help = {
     name: 'help',
+    register:true,
     description: 'Shows all available commands',
-    usage: '$help'
+    //usage: '/help'
 }

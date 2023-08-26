@@ -1,0 +1,44 @@
+{
+    "buttons":[
+        {
+            "id":"intro-saule",
+            "label":"Saulé",
+            "emoji":"✨",
+            "style":"Secondary",
+            "src":"Take Me To Church.mp3"
+        },
+        {
+            "id":"intro-kizube",
+            "label":"Kizube",
+            "emoji":"👔",
+            "style":"Secondary",
+            "src":""
+        },
+        {
+            "id":"intro-seymur",
+            "label":"Seymour",
+            "emoji":"⛑️",
+            "style":"Secondary",
+            "src":""
+        },
+        {
+            "id":"intro-kioshi",
+            "label":"Kioshi",
+            "emoji":"💻",
+            "style":"Secondary",
+            "src":"Aim to head - emperor.ogg"
+        },
+        {
+            "id":"stop",
+            "label":"Stop",
+            "emoji":"⏹️",
+            "style":"Primary"
+        },
+        {
+            "id":"pause",
+            "label":"Pause",
+            "emoji":"⏯️",
+            "style":"Primary"
+        }
+    ]
+}

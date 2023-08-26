@@ -3,7 +3,7 @@ const fileName = 'nicknames.json';
 const file = filePath + fileName;
 
 module.exports.execute = (msg, args) => {
-    util.print(msg,'',"Sorry <@"+msg.author.id+">, I'm the only one who can manage the nickname book.\nWhat am I supposed to do if you leave me without work?\nI don't want to go back to that alley...\n*soft sobbings*...",'red');
+    util.reply(msg,'',"Sorry <@"+msg.user.id+">, I'm the only one who can manage the nickname book.\nWhat am I supposed to do if you leave me without work?\nI don't want to go back to that alley...\n*soft sobbings*...",'red');
 }
 
 module.exports.updateNickname = (oldMember, newMember) => {
@@ -94,9 +94,9 @@ module.exports.renameNickname = (oldState,newState) => {
                 if(newState.channelId != null){
                     let channel = bot.channels.cache.filter((channel)=>{return channel.id == newState.channelId;  }).first();
                     if(err.code == 50013){
-                        channel.send({embeds: [util.doEmbed('',"Sorry <@"+userID+">, I'm not allowed to change your nickname.",'red')]});
+                        channel.send({embeds: [util.genEmbed('',"Sorry <@"+userID+">, I'm not allowed to change your nickname.",'red')]});
                     }else{
-                        channel.send({embeds: [util.doEmbed('',"Something happened!\nI couldn't update <@"+userID+">'s nickname\nError code: "+err.code,'red')]});
+                        channel.send({embeds: [util.genEmbed('',"Something happened!\nI couldn't update <@"+userID+">'s nickname\nError code: "+err.code,'red')]});
                     }
 
                 }
@@ -105,7 +105,7 @@ module.exports.renameNickname = (oldState,newState) => {
     }else if (owner){
         if(newState.channelId != null){
             let channel = bot.channels.cache.filter((channel)=>{return channel.id == newState.channelId;  }).first();
-            channel.send({embeds: [util.doEmbed('',"Sorry <@"+userID+">, I'm not allowed to change your nickname.",'red')]});
+            channel.send({embeds: [util.genEmbed('',"Sorry <@"+userID+">, I'm not allowed to change your nickname.",'red')]});
         }
     }
 }
@@ -141,6 +141,7 @@ module.exports.experimental = false;
 
 module.exports.help = {
     name: 'nickname',
+    register:true,
     description: 'Updates automatically the Nickname Tracker File',
     usage: "You simply don't use this command."
 }

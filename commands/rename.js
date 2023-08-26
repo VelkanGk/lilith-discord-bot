@@ -5,23 +5,17 @@ const file = filePath + fileName;
 module.exports.execute = (msg, args) => {
 
     if (!util.checkAuth(msg)){ 
-        util.print(msg,'',`Sorry <@${msg.author.id}>! I can't let you use this command`,'red');
+        util.print(msg,'',`Sorry <@${msg.user.id}>! I can't let you use this command`,'red');
         return; 
     }
 
-    //Drop first argument
-    args.splice(0,1);
-
-    //Get channel name
-    voiceName = args.join(" ");
-
     //Get channel properties
-    channel = bot.channels.cache.filter((channel)=>{ return channel.name === voiceName && channel.type === 'voice'; });
+    channel = bot.channels.cache.filter((channel)=>{ return channel.id == args['voice-channel'] && channel.type === 'voice'; });
     
     //if channel exists
     if(channel.size == 0 || channel.size != 1){
         //error message if channel not found
-        util.print(msg,'',"Sorry!\nI couldn't find a voice channel named '"+voiceName+"'",'red');
+        util.reply(msg,'',"Sorry!\nI couldn't find a voice channel with id "+args['voice-channel'],'red');
         return;
     }else{
         //get first channel from collection
@@ -36,7 +30,6 @@ module.exports.execute = (msg, args) => {
             nickJSON[guildID] = {};
             util.saveFile(file,fileName,nickJSON);
         }
-        
 
         //For each member connected in the voice channel
         for (const [memberID, member] of channel.members) {
@@ -53,23 +46,26 @@ module.exports.execute = (msg, args) => {
                     member.setNickname(newNickname).catch(
                         (err) => {
                             if(err.code == 50013){
-                                util.print(msg,'',"I'm not allowed to change "+member.user.username+"'s nickname",'red'); 
+                                util.reply(msg,'',"I'm not allowed to change "+member.user.username+"'s nickname",'red'); 
                             }else{
-                              util.print(msg,'',"Something happened!\nI couldn't update "+member.user.username+"'s nickname\nError code: "+err.code,'red');  
+                              util.reply(msg,'',"Something happened!\nI couldn't update "+member.user.username+"'s nickname\nError code: "+err.code,'red');  
                             }
                         }
                     );
                 }
             }
         }
-        
-    }
 
+    }
 }
 
-module.exports.experimental = false;
+
 module.exports.help = {
     name: 'rename',
+    register:true,
     description: 'Updates automatically the Nicknames of a voice channel from the tracker file',
-    usage: ".rename <Voice_Channel_Name>"
+    options:[
+        {name:"voice-channel",required:true,description:"Voice channel name", type:global.Discord.ApplicationCommandOptionType.Channel}
+    ],
+    //usage: "/rename <Voice_Channel_Name>"
 }

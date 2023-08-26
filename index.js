@@ -1,6 +1,6 @@
-const VERSION = "3.10.0";
+const VERSION = "4.0.0";
 
-const {Client, GatewayIntentBits} = require(`discord.js`);
+const {Client, GatewayIntentBits, REST, Routes } = require('discord.js');
 
 //REQUIRED ''IMPORTS''
 global.util = require('./utilities/util.js');               //My useful utility library
@@ -21,14 +21,19 @@ global.bot = new Client({
     ] 
 });
 
+
 //Code for dynamic command handling
 bot.commands = new Discord.Collection();
+reg_cmds = [];
 const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));
 for (const file of commandFiles) {
     const command = require(`./commands/${file}`);
-    // set a new item in the Collection
-    // with the key as the command name and the value as the exported module
-    bot.commands.set(command.help.name, command);
+    if(command.help.register){
+        // set a new item in the Collection
+        // with the key as the command name and the value as the exported module
+        bot.commands.set(command.help.name, command);
+        reg_cmds.push(command.help);
+    }
 }
 
 
@@ -49,21 +54,38 @@ global.nickTracker = require(trackerPath+nicknamesJSON);
 //discord bot authentication
 bot.login(config.token)
     .then(console.log("Bot Login"))
-    .catch(error => console.log("The provided token is invalid. Please check your config file in config/config.json for a valid bot token.\n" + error))
+    .catch(error => console.log("The provided token is invalid. Please check your config file in config/config.json for a valid bot token.\n" + error));
 
-bot.on('ready', () => {
-    console.log('This bot is now active\nv'+VERSION);
+
+bot.on('ready', (c) => {
+    console.log(`${c.user.username} is online v${VERSION}`);
+    console.log('Registering commands...');
+
+    //Get all guilds_id on which the bot is running
+    const Guilds = c.guilds.cache.map(guild => guild.id);
+
+    //Register commands for each guild
+    Guilds.forEach(guild => {
+        const rest = new REST({ version:'10' }).setToken(config.token);
+        (async ()=>{
+            try{
+                await rest.put(
+                    Routes.applicationGuildCommands(c.user.id+"",guild+""),
+                    { body: reg_cmds }
+                );
+                console.log(`Slash commands where registered for ${guild}!`);
+        
+            }catch(err){
+                console.log(reg_cmds);
+                console.log(`There was an error ${err}`);
+            }
+        })();
+    });
+
 });
 
-
-
-// ################ EVENTS ######################
-
-
-
-// Each message
 bot.on('messageCreate', msg => {
-
+    
     util.checkGuild(config,msg);
 
     let guildID = msg.guild.id
@@ -80,12 +102,11 @@ bot.on('messageCreate', msg => {
 
     //Check if is a dice cmd
     if(cmdString.match(/^\d+/) || cmdString.match(/^[dD]/)){
-        command = 'roll';
-    }else if(cmdString.match(/^min/) || cmdString.match(/^max/)){
-        command = 'minmax';
+        command = 'legacy_roll';
+    }else if(cmdString.match(/^vtm/)){
+        command = 'legacy_vtm';
     }else{
-        //First argument passed is set to command
-        command = args[0];
+        return;
     }
 
     //Exit if the command doesn't exit
@@ -93,21 +114,41 @@ bot.on('messageCreate', msg => {
 
     //Executing command
     try {
-        
-        if (msg.content.includes("info")) {
-            util.print(msg,command,bot.commands.get(command).help.description+"\n"+bot.commands.get(command).help.usage,'blue');
-        }else {
-            if (bot.commands.get(command).experimental && !config.experimental_commands) {
-                util.print(msg,'ERROR',"The command you tried to use is experimental.\nThe use may severly break the bot or other features\nTo activate it's use, change \`experimental_commands\` in settings",'red');
-            } else {
-                bot.commands.get(command).execute(msg, args);
-            }
-        }
+        bot.commands.get(command).execute(msg, args);
     } catch (error) {
         console.error(error);
         util.print(msg,'ERROR','Invalid Syntax: '+error,'red');
     }
 });
+
+
+//Slash command operations
+bot.on('interactionCreate',(interaction) => {
+
+    //is slash command
+    if(!interaction.isChatInputCommand() && !interaction.isButton()) return;
+
+    if(interaction.isChatInputCommand()){
+        //check if guils exists otherwise creates in config
+        util.checkGuild(config,interaction);
+        args = {};
+    
+        //arguments retrieval
+        bot.commands.get(interaction.commandName).help.options?.forEach( (op)=>{
+            if(interaction.options.get(op.name) != null){
+               args[op.name] = interaction.options.get(op.name).value; 
+            }
+        });
+    
+        bot.commands.get(interaction.commandName).execute(interaction, args);
+
+    }else if(interaction.isButton()){
+        bot.commands.get('soundboard').sounds(interaction);
+    }
+
+
+});
+
 
 
 //Welcome a new user
@@ -136,11 +177,4 @@ bot.on("channelDelete", (channel) => {
 //Clean user nicknames when leaves the guild (server)
 bot.on("guildMemberRemove", (member) => {
     bot.commands.get('nickname').removeMember(member);
-});
-
-bot.on('messageReactionAdd',(msgReaction,user) => {
-    console.log("reaction Added");
-});
-bot.on('messageReactionRemove', (msgReaction,user) => {
-    console.log("reaction removed");
 });

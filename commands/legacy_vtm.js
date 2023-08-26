@@ -35,39 +35,45 @@ let redImages=[],normalImages=[];
 
 module.exports.execute = (msg, args) => {
     try {
+
+        // Check input format
+        if(isNaN(args[1])||isNaN(args[2])){
+            util.print(msg,'',`**ERROR:** Invalid dice notation -> <@${msg.author.id}> Try this way:\n!vtm [Normal dice pool] [Hunger]\n!vtm 6 2`,'red');
+            return;
+        }
         
         //Get Dice to roll
-        hunger = Number(args.hunger);
-        dice = Number(args.pool);
+        hunger = Number(args[2]);
+        dice = Number(args[1]);
 
         //If user tries to roll a dice pool of 0 or less
         if(dice <= 0 || dice > 20){
-            util.reply(msg,'',`Ooops! <@${msg.user.id}> your [Normal dice pool] must be a number between 1-20`,'red');
+            util.print(msg,'',`Ooops! <@${msg.author.id}> your [Normal dice pool] must be a number between 1-20`,'red');
             return;
         }
     
         //If user tries to roll a dice pool with less than 0 hunger dice
-        if(hunger < 0 || hunger > 5){
-            util.reply(msg,'',`Ooops! <@${msg.user.id}> your [Hunger] must be a number between 1-5`,'red');
+        if(hunger < 0 || hunger > 6){
+            util.print(msg,'',`Ooops! <@${msg.author.id}> your [Hunger] must be a number between 1-5`,'red');
             return;
         }
         
         //If user tries to roll a dice pool with less than 0 hunger dice
         if(hunger > dice){
-            util.reply(msg,'',`Ooops! <@${msg.user.id}> your [Hunger] must be less or equal to your [normal dice pool]`,'red');
+            util.print(msg,'',`Ooops! <@${msg.author.id}> your [Hunger] must be less or equal to your [normal dice pool]`,'red');
             return;
         }
     
         //Roll dices and evaluate results
         evaluateResult();
 
-        let respuesta = `<@${msg.user.id}> has rolled Success: **${successes}** `;
+        let respuesta = `<@${msg.author.id}> has rolled Success: **${successes}** `;
         respuesta += "\nNormal: "+normalImages.join(' ');
         respuesta += "\nHunger: "+redImages.join(' ');
         if(messyFlag){ respuesta += "\n*Messy Critical!*"; }
         if(bestialFlag){ respuesta += "\n*Possible Bestial Failure!*"; }
         if(definiteBestialFlag){ respuesta += "\n*Bestial Failure!*"; }
-        util.reply(msg,'',respuesta,'blue');
+        util.print(msg,'',respuesta,'blue');
 
 
 
@@ -75,18 +81,14 @@ module.exports.execute = (msg, args) => {
         
     } catch (error) {
         //Whatever error handler :P
-        util.reply(msg,'',`**ERROR:** \"${error}\"`,'red');
+        util.print(msg,'',`**ERROR:** \"${error}\"`,'red');
     }
 }
 
 module.exports.help = {
-    name: 'vtm',
-    register:true,
-    description: 'Rolls dice for Vampire The Masquerade',
-    options:[
-        {name:"pool", required:true, description:"Size of your normal pool", type: global.Discord.ApplicationCommandOptionType.Number},
-        {name:"hunger", required:false, description:"Number of hunger dice from your pool", type: global.Discord.ApplicationCommandOptionType.Number}
-    ]
+    name: 'legacy_vtm',
+    register:false,
+    description: 'Old prefix notation .vtm [DicePool] [Hunger]',
 }
 
 
