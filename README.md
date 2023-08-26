@@ -19,9 +19,9 @@ For more details about installation, please check [WIKI > Installation](https://
 - Keep track of specific nicknames for users in certain channel.
 - Roll any dice combination.
 - Dedicated dice roller for some special rpgs (Vampire The Masquerade)
-- Set manually (command line) nicknames for users.
 - Use Discord interface to change the nicknames and the bot will keep track of these changes (no command line needed).
 - On Channel delete or user removal, the bot will automatically clean up the registries. So don't worry about it.
+- New soundboard functionality added
 - Has a super nice personality with fancy messages!
 
 ## Capability Clarification
