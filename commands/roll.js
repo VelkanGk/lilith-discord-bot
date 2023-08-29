@@ -1,4 +1,4 @@
-module.exports.execute = (msg, args) => {
+module.exports.execute = (msg, args) => {    
     try {
         var error = [];
         var response = [];
@@ -7,6 +7,7 @@ module.exports.execute = (msg, args) => {
         for (let i = 0; i < arg.length; i++) {
             var roll = [];
             let total = 0;
+            if(arg[i].match(/^\./)){ arg[i] = arg[i].replace('.',''); }
             //Autocomplete dice cmd
             if(arg[i].match(/^d/)){ arg[i] = "1"+arg[i]; }
             
@@ -51,8 +52,10 @@ module.exports.execute = (msg, args) => {
             //Apply modifiers to total roll
             let diceRolled = diceNumber+'d'+diceType;
             for(let j = 1; j < m.length; j++){
-                total += Number(m[j]);
-                diceRolled += m[j];
+                if(!isNaN(m[j])){
+                    total += Number(m[j]);
+                    diceRolled += m[j];
+                }
             }
             
             //Final response

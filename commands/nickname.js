@@ -141,7 +141,7 @@ module.exports.experimental = false;
 
 module.exports.help = {
     name: 'nickname',
-    register:true,
+    register:false,
     description: 'Updates automatically the Nickname Tracker File',
     usage: "You simply don't use this command."
 }
